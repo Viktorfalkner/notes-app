@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "migrate": "drizzle-kit generate --dialect=postgresql  --schema=./src/db/schemas/*.ts --out=./src/db/migrations/drizzle && node ./src/db/migrations/migrate.js"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
