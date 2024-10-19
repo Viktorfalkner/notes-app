@@ -10,6 +10,8 @@
     "migrate": "drizzle-kit generate --dialect=postgresql  --schema=./src/db/schemas/*.ts --out=./src/db/migrations/drizzle && node ./src/db/migrations/migrate.js"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.5.1",
+    "@supabase/supabase-js": "^2.45.6",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.35.2",
     "next": "14.2.15",
