@@ -1,29 +1,35 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { updateSession } from './utils/supabase/middleware'
+import { createClient } from '@/utils/supabase/server'
+
 
 export async function middleware(request: NextRequest) {
+  // return await updateSession(request)
+
+  console.log("MIDDLEWARE HIT");
+
+
   let response = NextResponse.next({
     request: {
       headers: request.headers,
     },
   });
-
   const path = new URL(request.url).pathname;
 
-  const unprotectedPaths = ["/login", "/create-account"];
+  const unprotectedPaths = ["/login"];
 
-  const user = await getUser(request, response);
+  const supabase = createClient()
+
+  const { data, error } = await supabase.auth.getUser()
   const isUnprotectedPath = unprotectedPaths.some((up) => path.startsWith(up));
 
-  // If signed-in AND an unprotected Path -> Go to home
+  const user = data.user
+
   if (user && isUnprotectedPath) {
-    console.log("im here")
+    console.log("User logged in - redirecting to Dash", user)
     return NextResponse.redirect(new URL("/", request.url));
-
-    // Not logged in? and going to a protected Path? 
   } else if (!user && !isUnprotectedPath) {
-    console.log("im herely")
-
+    console.log("User not logged in - redirecting to login", user)
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
@@ -31,57 +37,14 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
-};
-
-async function getUser(request: NextRequest, response: NextResponse) {
-  const supabaseClient = createServerClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value;
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          request.cookies.set({
-            name,
-            value,
-            ...options,
-          });
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          });
-          response.cookies.set({
-            name,
-            value,
-            ...options,
-          });
-        },
-        remove(name: string, options: CookieOptions) {
-          request.cookies.set({
-            name,
-            value: "",
-            ...options,
-          });
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          });
-          response.cookies.set({
-            name,
-            value: "",
-            ...options,
-          });
-        },
-      },
-    },
-  );
-
-  const user = (await supabaseClient.auth.getUser()).data.user;
-
-  return user;
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * Feel free to modify this pattern to include more paths.
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
 }

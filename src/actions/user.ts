@@ -1,66 +1,66 @@
-'use server'
+"use server";
 
-import { getSupabaseAuth } from "@/lib/auth";
-import { getErrorMessage } from "@/lib/utils"
+// import { getSupabaseAuth } from "@/lib/auth";
+import { getErrorMessage } from "@/lib/utils";
+import { createClient } from '@/utils/supabase/server'
 
-export const createAccountAction = async(formData: FormData) => {
-    try {
-        const email = formData.get("email") as string;
-        const password = formData.get("password") as string;
+const supabase = createClient()
 
-        console.log("EMAIL AND PASSWORD", email, password)
 
-        const { error } = await getSupabaseAuth().signUp( {
-            email,
-            password,
-        });
-        if (error) throw error;
-        
-        const { data, error: loginError} =
-        await getSupabaseAuth().signInWithPassword({
-            email,
-            password,
-        });
+export const createAccountAction = async (formData: FormData) => {
+  try {
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
 
-        if (loginError) throw loginError;
-        if (!data.session) throw new Error("No Session");
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+    if (error) throw error;
 
-        return {errorMessage: null}
-    } catch (error) {
-        return {errorMessage: getErrorMessage(error)}
-    }
-}
+    const { data, error: loginError } =
+      await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-export const loginAction = async(formData: FormData) => {
-    try {
-        const email = formData.get("email") as string;
-        const password = formData.get("password") as string;
+    console.log("LOGIN DATA:", data)
 
-        const { data, error: loginError} =
-        await getSupabaseAuth().signInWithPassword({
-            email,
-            password,
-        });
+    if (loginError) throw loginError;
+    if (!data.session) throw new Error("No session");
 
-        if (loginError) throw loginError;
-        if (!data.session) throw new Error("No Session");
-        
-        return {errorMessage: null}
-    } catch (error) {
-        return {errorMessage: getErrorMessage(error)}
-    }
-}
+    return { errorMessage: null };
+  } catch (error) {
+    return { errorMessage: getErrorMessage(error) };
+  }
+};
 
+export const loginAction = async (formData: FormData) => {
+  try {
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    const { data, error: loginError } =
+      await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+    if (loginError) throw loginError;
+    if (!data.session) throw new Error("No session");
+
+    return { errorMessage: null };
+  } catch (error) {
+    return { errorMessage: getErrorMessage(error) };
+  }
+};
 
 export const logoutAction = async () => {
-    try {
-        const { error:  error} =
-        await getSupabaseAuth().signOut();
+  try {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
 
-        if (error) throw error;
-
-        return {errorMessage: null}
-    } catch (error) {
-        return {errorMessage: getErrorMessage(error)}
-    }
-}
+    return { errorMessage: null };
+  } catch (error) {
+    return { errorMessage: getErrorMessage(error) };
+  }
+};

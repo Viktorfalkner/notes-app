@@ -1,6 +1,6 @@
 'use client'
 
-import { createAccountAction, loginAction } from '@/actions/user';
+import { loginAction } from '@/actions/user';
 import Link from 'next/link'
 import React, { useTransition } from 'react'
 import { useRouter } from 'next/navigation';
@@ -10,19 +10,18 @@ function LoginPage() {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
 
-    const handleClickLoginAction = async (formData: FormData) => {
+    const handleClickLoginButton = async (formData: FormData) => {
         startTransition(async () => {
-            const {errorMessage} = await loginAction(formData)
-            if (!errorMessage) {
-                router.replace("/")
-                toast.success("Successfully logged in");
-            } else {
-                toast.error(errorMessage)
-            }
-
-        })
-
-    }
+          const { errorMessage } = await loginAction(formData);
+          if (!errorMessage) {
+            router.replace("/");
+            toast.success("Successfully logged in");
+          } else {
+            toast.error(errorMessage);
+          }
+        });
+      };
+    
 
   return (
     <main className='flex min-h-screen items-center justify-center px-4 pb-24'>
@@ -37,7 +36,7 @@ function LoginPage() {
             )}
 
             <form className={`flex w-full flex-col gap-4 ${isPending && "-z-10 opacity-0"}`}
-            action={handleClickLoginAction}
+            action={handleClickLoginButton}
             >
                 <input 
                 className='border border-zinc-800 rounded-md p-4'
@@ -60,11 +59,10 @@ function LoginPage() {
                 <p className='mt-3 text-center text-xs'>
                     Don't have an account? 
                     <Link href='/create-account' className='hover:text-purple-500 ml-2 underline transition-colors durations-200 ease-in-out'>
-                    Sign up
+                    Create Account
                     </Link>
                 </p>
             </form>
-             
         </div>
     </main>
   )
