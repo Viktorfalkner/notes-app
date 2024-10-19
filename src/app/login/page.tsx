@@ -55,7 +55,7 @@ function LoginPage() {
                     required 
                     disabled={isPending}
                     />
-                <button className='border border-zinc-800 rounded-md p-2 bg-green-500 text-white font-semibold text-xl'>Create Account</button>
+                <button className='border border-zinc-800 rounded-md p-2 bg-green-500 text-white font-semibold text-xl'>Login</button>
 
                 <p className='mt-3 text-center text-xs'>
                     Don't have an account? 
