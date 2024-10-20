@@ -6,14 +6,6 @@ import { NextResponse, type NextRequest } from 'next/server'
 export async function middleware(request: NextRequest) {
   let { user, supabaseResponse } = await updateSession(request);
 
-  console.log("IN THE MIDDLEWARE")
-
-
-//   if (!user && request.nextUrl.pathname === '/login') {
-//     supabaseResponse = NextResponse.redirect(new URL('/login', request.url));
-//     return supabaseResponse;
-// }
-
 const path = new URL(request.url).pathname;
 
 const unprotectedPaths = ["/login", "/create-account"];
