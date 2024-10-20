@@ -4,6 +4,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 
 export async function middleware(request: NextRequest) {
+  // eslint-disable-next-line prefer-const
   let { user, supabaseResponse } = await updateSession(request);
 
 const path = new URL(request.url).pathname;
