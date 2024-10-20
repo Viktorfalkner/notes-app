@@ -1,39 +1,36 @@
-import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from './utils/supabase/middleware'
-import { createClient } from '@/utils/supabase/server'
+import { NextResponse, type NextRequest } from 'next/server'
+
 
 
 export async function middleware(request: NextRequest) {
-  // return await updateSession(request)
+  let { user, supabaseResponse } = await updateSession(request);
 
-  console.log("MIDDLEWARE HIT");
+  console.log("IN THE MIDDLEWARE")
 
 
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
-  const path = new URL(request.url).pathname;
+//   if (!user && request.nextUrl.pathname === '/login') {
+//     supabaseResponse = NextResponse.redirect(new URL('/login', request.url));
+//     return supabaseResponse;
+// }
 
-  const unprotectedPaths = ["/login"];
+const path = new URL(request.url).pathname;
 
-  const supabase = createClient()
+const unprotectedPaths = ["/login", "/create-account"];
+const isUnprotectedPath = unprotectedPaths.some((up) => path.startsWith(up));
 
-  const { data, error } = await supabase.auth.getUser()
-  const isUnprotectedPath = unprotectedPaths.some((up) => path.startsWith(up));
+console.log("User & isUnprotectedPath", user?.id, isUnprotectedPath)
 
-  const user = data.user
+if (user && isUnprotectedPath) {
+  console.log("User logged in - redirecting to Dash", user)
+  return NextResponse.redirect(new URL("/", request.url));
+} else if (!user && !isUnprotectedPath) {
+  console.log("User not logged in - redirecting to login", user)
+  return NextResponse.redirect(new URL("/login", request.url));
+}
 
-  if (user && isUnprotectedPath) {
-    console.log("User logged in - redirecting to Dash", user)
-    return NextResponse.redirect(new URL("/", request.url));
-  } else if (!user && !isUnprotectedPath) {
-    console.log("User not logged in - redirecting to login", user)
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
-
-  return response;
+  supabaseResponse = NextResponse.next();
+  return supabaseResponse;
 }
 
 export const config = {
@@ -45,6 +42,6 @@ export const config = {
      * - favicon.ico (favicon file)
      * Feel free to modify this pattern to include more paths.
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 }

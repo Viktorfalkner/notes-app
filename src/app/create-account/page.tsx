@@ -22,9 +22,7 @@ function CreateAccount() {
             } else {
                 toast.error(errorMessage)
             }
-
         })
-
     }
 
 

@@ -10,18 +10,18 @@ function LoginPage() {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
 
-    const handleClickLoginButton = async (formData: FormData) => {
+    const handleClickLoginAction = async (formData: FormData) => {
         startTransition(async () => {
-          const { errorMessage } = await loginAction(formData);
-          if (!errorMessage) {
-            router.replace("/");
-            toast.success("Successfully logged in");
-          } else {
-            toast.error(errorMessage);
-          }
-        });
-      };
-    
+            const {errorMessage} = await loginAction(formData)
+            
+            if (!errorMessage) {
+                router.replace("/")
+                toast.success("Successfully logged in");
+            } else {
+                toast.error(errorMessage)
+            }
+        })
+    }
 
   return (
     <main className='flex min-h-screen items-center justify-center px-4 pb-24'>
@@ -36,7 +36,7 @@ function LoginPage() {
             )}
 
             <form className={`flex w-full flex-col gap-4 ${isPending && "-z-10 opacity-0"}`}
-            action={handleClickLoginButton}
+            action={handleClickLoginAction}
             >
                 <input 
                 className='border border-zinc-800 rounded-md p-4'
