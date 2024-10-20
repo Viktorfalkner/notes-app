@@ -1,36 +1,10 @@
-"use client";
-
-import { logoutAction } from "@/actions/user";
-import React, { useTransition } from "react";
-import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
+import React from "react";
+import Header from "@/components/Header";
 
 export default function Home() {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-
-  const handleLogoutButtonClick = async () => {
-    startTransition(async () => {
-      const { errorMessage } = await logoutAction();
-      if (!errorMessage) {
-        router.replace("/");
-        toast.success("Successfully logged in");
-      } else {
-        toast.error(errorMessage);
-      }
-    });
-  };
-
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)] text-white">
-      App
-      <button
-        disabled={isPending}
-        className="h-[50px] w-[400px] border border-white text-white"
-        onClick={handleLogoutButtonClick}
-      >
-        Logout
-      </button>
+    <div className="flex min-h-screen flex-col items-center px-4 pb-24">
+      <Header />
     </div>
   );
 }
